@@ -46,17 +46,20 @@ public class Main extends Activity {
 
         data.clear();
 
-        for (int j = 0; j < 6; j++) // Take 6 samples
-        {
+        //for (int j = 0; j < 6; j++) // Take 6 samples
+        //{
+            long startTime = System.nanoTime(); // Start timer
             _aru.startRecording();
             shortsRead = _aru.read(buffer, 0, buffer.length);
             for (int i = 0; i < shortsRead; i++) { // Copy data from buffer into stack.
                 data.add(buffer[i]);
             }
+            long endTime = System.nanoTime();
+            long duration = (endTime - startTime) /1000000;
             // TODO Change this to setting the read(_,0,_) param to the offset. hopefully this will be faster
-        }
+        //}
 
-        String text = ""; // Write the last sample to the ScrollView
+        String text = String.valueOf(duration); // Write the last sample to the ScrollView
         for (int i = 0; i < shortsRead; i++)
         {
             String num = "" + i;
