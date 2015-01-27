@@ -1,5 +1,7 @@
 package com.example.hunt.comtesting;
 
+import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,12 +35,34 @@ public class SerialDecoder
     private List<Integer> _bits = new ArrayList<Integer>();  // DEBUG
 
     //////////////////////////////
+    // Debug
+    /////////////////////////////
+
+    TextView _data;
+    TextView _hijack;
+
+    public void regTextViews(TextView data, TextView hijack)
+    {
+        _data = data;
+        _hijack = hijack;
+    }
+
+    //////////////////////////////
     // Constructors
     /////////////////////////////
 
     public SerialDecoder() {
         //_audioReceiver = new AudioReceiver(new FakeAudioRecord());  //DEBUG
-        _audioReceiver.registerIncomingSink(_incomingSink);
+        try {
+            _audioReceiver = new AudioReceiver();
+            _audioReceiver.registerIncomingSink(_incomingSink);
+            //_audioReceiver.
+        }
+        catch (Exception e)
+        {
+            String s = e.getMessage();
+            s = s + "";
+        }
     }
 
 	/*
@@ -201,6 +225,11 @@ public class SerialDecoder
         System.out.println("--- nBYTE---");
         System.out.println(_nByte.GetValue());
         System.out.println(_nByte.intVal());
+    }
+
+    public int getSampleRate()
+    {
+        return _audioReceiver.getPowerFrequency();
     }
 
     public void start() {

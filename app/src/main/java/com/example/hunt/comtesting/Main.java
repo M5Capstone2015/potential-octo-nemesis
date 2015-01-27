@@ -6,7 +6,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,8 +24,8 @@ public class Main extends Activity {
     TextView hijackTextView = null;
     TextView phoneDataTextView = null;
     private static int[] mSampleRates = new int[]{8000, 11025, 22050, 44100};
-    AudioRecord _aru = null;
-    AudioReceiver reader = null;
+    //AudioRecord _aru = null;
+    SerialDecoder _decoder = null;
     short[] buffer = null;
 
     List<Short> data = new ArrayList<Short>();
@@ -38,41 +37,6 @@ public class Main extends Activity {
 
 
     public void readClick(View v) {
-        int shortsRead = 0;
-        if (_aru == null)
-            return;
-
-        data.clear();
-
-        long startTime = System.nanoTime(); // Start timer
-
-        //for (int j = 0; j < 6; j++) // Take 6 samples
-        //{
-            _aru.startRecording();
-            shortsRead = _aru.read(buffer, 0, buffer.length);
-            long endTime = System.nanoTime(); // End timer
-            for (int i = 0; i < shortsRead; i++) { // Copy data from buffer into stack.
-                data.add(buffer[i]);
-            }
-            // TODO Change this to setting the read(_,0,_) param to the offset. hopefully this will be faster
-        //}
-
-        String text = ""; // Write the last sample to the ScrollView
-
-        long duration = (endTime - startTime) / 1000000; // Calc milliseconds
-
-        text += ("Sample time:  " + String.valueOf(duration));
-
-        for (int i = 0; i < shortsRead; i++) {
-            String num = "" + i;
-            String val = Short.toString(buffer[i]);
-            text += "\n" + num + ", " + val;
-        }
-
-        dataTextView.setText(text);
-    }
-
-    public void readClick2(View v) {
     }
 
     public void clearClick(View v) {
@@ -82,12 +46,13 @@ public class Main extends Activity {
     }
 
     public void processClick(View v) {
-        if (reader != null)
+        if (_decoder != null)
         {
-            reader.startAudioIO();
+            /*
+            _decoder.startAudioIO();
 
             long startTime = System.nanoTime(); // Start timer
-            List<Integer> freqs = reader.fakeAudioRead(data);
+            List<Integer> freqs = _decoder.fakeAudioRead(data);
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) / 1000000;
 
@@ -100,6 +65,7 @@ public class Main extends Activity {
                 text = text + "\n" + String.valueOf(i);
 
             hijackTextView.setText(text);
+            */
         }
         else {
             hijackTextView.setText("\nReader object null.");
@@ -108,28 +74,29 @@ public class Main extends Activity {
 
     private void initialize()
     {
-        int recBufferSize =
-                AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        buffer = new short[recBufferSize * 10];
-        _aru = findAudioRecord();
-        reader = new AudioReceiver(_aru);
+        //int recBufferSize =
+                //AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        //buffer = new short[recBufferSize * 10];
+
+        //_aru = findAudioRecord();
+
+        //_decoder = new AudioReceiver(_aru);
 
         dataTextView = (TextView) findViewById(R.id.dataText);
         hijackTextView = (TextView) findViewById(R.id.hijackData);
         phoneDataTextView = (TextView) findViewById(R.id.phoneData);
 
-        int fre =_aru.getSampleRate();
-        phoneDataTextView.setText("Sample Frequency:  " + String.valueOf(fre));
+        _decoder = new SerialDecoder();
+        _decoder.regTextViews(dataTextView, hijackTextView);
+
+        //int fre = _decoder.getSampleRate();
+        //phoneDataTextView.setText("Sample Frequency:  " + String.valueOf(fre));
     }
 
-    private double Average(short[] bytes)
+    // DEBUG FUNC //
+    public String read()
     {
-        double sum = 0;
-        for (int i = 0; i < bytes.length; i++) {
-            Short s = bytes[i];
-            sum = sum + s.doubleValue();
-        }
-        return sum / bytes.length;
+        return "";
     }
 
     public void WriteToFile(String content)
@@ -146,36 +113,6 @@ public class Main extends Activity {
         catch (IOException e)
         {
         }
-    }
-
-    private AudioRecord findAudioRecord()
-    {
-        AudioRecord aru = null;
-        for (int rate : mSampleRates)
-        {
-            for (short audioFormat : new short[] { AudioFormat.ENCODING_PCM_8BIT, AudioFormat.ENCODING_PCM_16BIT })
-            {
-                for (short channelConfig : new short[] { AudioFormat.CHANNEL_IN_MONO, AudioFormat.CHANNEL_IN_STEREO })
-                {
-                    try {
-                        //Log.d(C.TAG, "Attempting rate " + rate + "Hz, bits: " + audioFormat + ", channel: "
-                        //+ channelConfig);
-                        int bufferSize = AudioRecord.getMinBufferSize(rate, channelConfig, audioFormat);
-
-                        if (bufferSize != AudioRecord.ERROR_BAD_VALUE) {
-                            // check if we can instantiate and have a success
-                            AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, rate, channelConfig, audioFormat, bufferSize);
-
-                            if (recorder.getState() == AudioRecord.STATE_INITIALIZED)
-                                aru = recorder;
-                        }
-                    } catch (Exception e) {
-                        //Log.e(C.TAG, rate + "Exception, keep trying.",e);
-                    }
-                }
-            }
-        }
-        return aru;
     }
 
 
