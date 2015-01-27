@@ -6,7 +6,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,7 +39,7 @@ public class Main extends Activity {
 
     public void readClick(View v)
     {
-        int shortsRead = 0;
+        int shortsRead;
         if (_aru == null)
             return;
 
@@ -59,7 +58,7 @@ public class Main extends Activity {
             // TODO Change this to setting the read(_,0,_) param to the offset. hopefully this will be faster
         //}
 
-        String text = String.valueOf(duration); // Write the last sample to the ScrollView
+        String text = "Read time:  " + String.valueOf(duration) + " ms"; // Write the last sample to the ScrollView
         for (int i = 0; i < shortsRead; i++)
         {
             String num = "" + i;
@@ -117,6 +116,7 @@ public class Main extends Activity {
         phoneDataTextView.setText("Sample Frequency:  " + String.valueOf(fre));
     }
 
+    /*
     private double Average(short[] bytes)
     {
         double sum = 0;
@@ -126,6 +126,7 @@ public class Main extends Activity {
         }
         return sum / bytes.length;
     }
+    */
 
     public void WriteToFile(String content)
     {
