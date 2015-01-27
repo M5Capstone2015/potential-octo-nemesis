@@ -28,6 +28,7 @@ public class Main extends Activity {
     AudioRecord _aru = null;
     AudioReceiver reader = null;
     short[] buffer = null;
+
     List<Short> data = new ArrayList<Short>();
 
     public void saveClick(View v) {
@@ -39,31 +40,29 @@ public class Main extends Activity {
     public void readClick(View v)
     {
         int shortsRead = 0;
-        // Run AudioRecord and Save to file. Print average to and num read.
-        if (_aru != null)
+        if (_aru == null)
+            return;
+
+        data.clear();
+
+        for (int j = 0; j < 6; j++) // Take 6 samples
         {
             _aru.startRecording();
             shortsRead = _aru.read(buffer, 0, buffer.length);
-
-            //double average = Average(buffer);
-            //textView.setText(String.valueOf(shortsRead) + "\nAverage: " + String.valueOf(average));
-        }
-        else
-        {
-            //textView.setText("AudioRecord is null");
-        }
-
-        data.clear();
-        String text = "";
-        if (buffer.length > 10)
-            for (int i = 0; i < shortsRead; i++)
-            {
+            for (int i = 0; i < shortsRead; i++) { // Copy data from buffer into stack.
                 data.add(buffer[i]);
-                String num = "" + i;
-                String val = Short.toString(buffer[i]);
-                text += "\n" + num + ", " + val;
             }
-        //processInputBuffer(shortsRead2);
+            // TODO Change this to setting the read(_,0,_) param to the offset. hopefully this will be faster
+        }
+
+        String text = ""; // Write the last sample to the ScrollView
+        for (int i = 0; i < shortsRead; i++)
+        {
+            String num = "" + i;
+            String val = Short.toString(buffer[i]);
+            text += "\n" + num + ", " + val;
+        }
+
         dataTextView.setText(text);
     }
 
@@ -84,6 +83,7 @@ public class Main extends Activity {
             long duration = (endTime - startTime) /1000000;
 
             String text = "\nHiJack Data:";
+            text += ("Num data points:  " + String.valueOf(data.size()));
             text += ("\nNum freq coefficients:  " + String.valueOf(freqs.size()));
             text += ("\nCalculation time:" + String.valueOf(duration) + " ms");
 
