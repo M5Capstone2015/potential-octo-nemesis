@@ -24,7 +24,8 @@ public class Main extends Activity {
     TextView dataTextView = null;
     TextView hijackTextView = null;
     TextView phoneDataTextView = null;
-    private static int[] mSampleRates = new int[] {8000, 11025, 22050, 44100};
+    //private static int[] mSampleRates = new int[] {8000, 11025, 22050, 44100};
+    private static int[] mSampleRates = new int[] {44100, 22050, 11025, 8000};
     AudioRecord _aru = null;
     AudioReceiver reader = null;
     short[] buffer = null;
