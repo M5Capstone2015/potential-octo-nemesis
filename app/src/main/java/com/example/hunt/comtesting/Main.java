@@ -37,6 +37,10 @@ public class Main extends Activity {
 
 
     public void readClick(View v) {
+        if (_decoder != null)
+        {
+            nData data = _decoder.Read();
+        }
     }
 
     public void clearClick(View v) {
@@ -50,14 +54,17 @@ public class Main extends Activity {
         {
             /*
             _decoder.startAudioIO();
+            */
 
             long startTime = System.nanoTime(); // Start timer
-            List<Integer> freqs = _decoder.fakeAudioRead(data);
+
+            List<Integer> freqs = _decoder.LowLevelProccess();
+
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) / 1000000;
 
             String text = "\nHiJack Data:";
-            text += ("Num data points:  " + String.valueOf(data.size()));
+            text += ("Num data points:  " + String.valueOf(freqs.size()));
             text += ("\nNum freq coefficients:  " + String.valueOf(freqs.size()));
             text += ("\nCalculation time:" + String.valueOf(duration) + " ms");
 
@@ -65,7 +72,6 @@ public class Main extends Activity {
                 text = text + "\n" + String.valueOf(i);
 
             hijackTextView.setText(text);
-            */
         }
         else {
             hijackTextView.setText("\nReader object null.");
@@ -74,14 +80,6 @@ public class Main extends Activity {
 
     private void initialize()
     {
-        //int recBufferSize =
-                //AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        //buffer = new short[recBufferSize * 10];
-
-        //_aru = findAudioRecord();
-
-        //_decoder = new AudioReceiver(_aru);
-
         dataTextView = (TextView) findViewById(R.id.dataText);
         hijackTextView = (TextView) findViewById(R.id.hijackData);
         phoneDataTextView = (TextView) findViewById(R.id.phoneData);
@@ -89,14 +87,8 @@ public class Main extends Activity {
         _decoder = new SerialDecoder();
         _decoder.regTextViews(dataTextView, hijackTextView);
 
-        //int fre = _decoder.getSampleRate();
-        //phoneDataTextView.setText("Sample Frequency:  " + String.valueOf(fre));
-    }
-
-    // DEBUG FUNC //
-    public String read()
-    {
-        return "";
+        int fre = _decoder.getSampleRate();
+        phoneDataTextView.setText("Sample Frequency:  " + String.valueOf(fre));
     }
 
     public void WriteToFile(String content)

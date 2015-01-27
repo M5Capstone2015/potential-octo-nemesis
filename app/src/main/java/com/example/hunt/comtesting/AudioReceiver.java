@@ -1,6 +1,8 @@
 package com.example.hunt.comtesting;
 
+import android.media.AudioFormat;
 import android.media.AudioRecord;
+import android.media.MediaRecorder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,38 @@ public class AudioReceiver {
 
     public AudioReceiver()
     {
-        //_audioRecord =
+        _audioRecord = findAudioRecord();
+        attachAudioResources();
+    }
+
+    private static int[] mSampleRates = new int[] {44100, 22050, 11025, 8000};
+    private AudioRecord findAudioRecord()
+    {
+        for (int rate : mSampleRates)
+        {
+            for (short audioFormat : new short[] { AudioFormat.ENCODING_PCM_8BIT, AudioFormat.ENCODING_PCM_16BIT })
+            {
+                for (short channelConfig : new short[] { AudioFormat.CHANNEL_IN_MONO, AudioFormat.CHANNEL_IN_STEREO })
+                {
+                    try {
+                        //Log.d(C.TAG, "Attempting rate " + rate + "Hz, bits: " + audioFormat + ", channel: "
+                        //+ channelConfig);
+                        int bufferSize = AudioRecord.getMinBufferSize(rate, channelConfig, audioFormat);
+
+                        if (bufferSize != AudioRecord.ERROR_BAD_VALUE) {
+                            // check if we can instantiate and have a success
+                            AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, rate, channelConfig, audioFormat, bufferSize);
+
+                            if (recorder.getState() == AudioRecord.STATE_INITIALIZED)
+                                return recorder;
+                        }
+                    } catch (Exception e) {
+                        //Log.e(C.TAG, rate + "Exception, keep trying.",e);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 
@@ -289,6 +322,12 @@ public class AudioReceiver {
         //System.out.println("data size: " + _recBuffer.length);
         //processInputBuffer(_recBuffer.length);
     }
+
+    /*
+    public short[] rawRead(short[] _buf)
+    {
+    }
+    */
 
     public List<Integer> fakeAudioRead(List<Short> data)  // Change this to return any freq coefficients.
     {

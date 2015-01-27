@@ -33,6 +33,8 @@ public class SerialDecoder
     OnBytesAvailableListener _bytesAvailableListener = null;
 
     private List<Integer> _bits = new ArrayList<Integer>();  // DEBUG
+    private List<Integer> _coeffs = new ArrayList<>();
+    private List<Boolean> _trans = new ArrayList<>();
 
     //////////////////////////////
     // Debug
@@ -76,9 +78,13 @@ public class SerialDecoder
     // Receive State Machine
     /////////////////////////////
     private IncomingSink _incomingSink = new IncomingSink() {
+
         public void handleNextBit(int transistionPeriod, boolean isHighToLow)
         {
             _freq = checkFreq(transistionPeriod);
+
+            _coeffs.add(transistionPeriod);
+            _trans.add(isHighToLow);
 
             // DEBUG //
             System.out.println("Tran: " + transistionPeriod + " HL: " + isHighToLow);
@@ -215,16 +221,20 @@ public class SerialDecoder
 
     //////////////////////////////
     // Public Interface
-    /////////////////////////////
-    public void print() // DEBUG
+
+    public nData Read()
     {
-        for (Integer i : _bits)
-        {
-            System.out.println("BIT:  " + i);
-        }
-        System.out.println("--- nBYTE---");
-        System.out.println(_nByte.GetValue());
-        System.out.println(_nByte.intVal());
+        return null;
+    }
+
+    public List<Integer> LowLevelProccess()
+    {
+        return _audioReceiver.fakeAudioRead();
+    }
+
+    public List<Integer> HighlevelProcess()
+    {
+        return _bits;
     }
 
     public int getSampleRate()
