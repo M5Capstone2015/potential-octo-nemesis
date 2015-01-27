@@ -59,7 +59,8 @@ public class Main extends Activity {
         //}
 
         String text = "Read time:  " + String.valueOf(duration) + " ms"; // Write the last sample to the ScrollView
-        for (int i = 0; i < shortsRead; i++)
+        if (shortsRead > 300)
+        for (int i = 0; i < 300; i++)
         {
             String num = "" + i;
             String val = Short.toString(buffer[i]);
