@@ -60,6 +60,13 @@
             android:text="Raw Data Here..."
             android:id="@+id/dataText" />
     </ScrollView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="HiJack Stats"
+        android:id="@+id/hijackStats" />
+
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="200dp"

@@ -23,17 +23,20 @@ public class Main extends Activity {
     TextView dataTextView = null;
     TextView hijackTextView = null;
     TextView phoneDataTextView = null;
+    TextView hijackStats = null;
     //private static int[] mSampleRates = new int[] {8000, 11025, 22050, 44100};
     private static int[] mSampleRates = new int[] {44100, 22050, 11025, 8000};
     AudioRecord _aru = null;
     AudioReceiver reader = null;
     short[] buffer = null;
 
-    List<Short> data = new ArrayList<Short>();
+    List<Short> data = new ArrayList<>();
 
     public void saveClick(View v) {
         String text = dataTextView.getText().toString();
-        WriteToFile(text);
+        String hijackText = hijackTextView.getText().toString();
+        WriteToFile(text, "dump.csv");
+        WriteToFile(hijackText, "hijack_dump.csv");
     }
 
 
@@ -86,11 +89,14 @@ public class Main extends Activity {
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) /1000000;
 
-            String text = "\nHiJack Data:";
-            text += ("Num data points:  " + String.valueOf(data.size()));
-            text += ("\nNum freq coefficients:  " + String.valueOf(freqs.size()));
-            text += ("\nCalculation time:" + String.valueOf(duration) + " ms");
+            String statText = "\nHiJack Data:";
+            statText += ("Num data points:  " + String.valueOf(data.size()));
+            statText += ("\nNum freq coefficients:  " + String.valueOf(freqs.size()));
+            statText += ("\nCalculation time:" + String.valueOf(duration) + " ms");
 
+            hijackStats.setText(statText);
+
+            String text = "";
             for (int i : freqs)
                 text = text + "\n" + String.valueOf(i);
 
@@ -112,6 +118,7 @@ public class Main extends Activity {
         dataTextView = (TextView) findViewById(R.id.dataText);
         hijackTextView = (TextView) findViewById(R.id.hijackData);
         phoneDataTextView = (TextView) findViewById(R.id.phoneData);
+        hijackStats = (TextView) findViewById(R.id.hijackStats);
 
         int fre =_aru.getSampleRate();
         phoneDataTextView.setText("Sample Frequency:  " + String.valueOf(fre));
@@ -129,11 +136,11 @@ public class Main extends Activity {
     }
     */
 
-    public void WriteToFile(String content)
+    public void WriteToFile(String content, String filename)
     {
         OutputStream fos;
         try {
-            fos = openFileOutput("dump.csv", Context.MODE_WORLD_READABLE);
+            fos = openFileOutput(filename, Context.MODE_WORLD_READABLE);
             fos.write(content.getBytes());
             fos.close();
         }
