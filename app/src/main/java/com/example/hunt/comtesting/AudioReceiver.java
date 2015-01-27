@@ -1,6 +1,8 @@
 package com.example.hunt.comtesting;
 
+import android.media.AudioFormat;
 import android.media.AudioRecord;
+import android.media.MediaRecorder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +11,44 @@ public class AudioReceiver {
     ///////////////////////////////////////////////
     // Constructors
     ///////////////////////////////////////////////
-    public AudioReceiver(AudioRecord aru)
-    {
+    public AudioReceiver(AudioRecord aru) {
         _audioRecord = aru;
     }
 
+    public AudioReceiver()
+    {
+        _audioRecord = findAudioRecord();
+    }
+
+    private static int[] mSampleRates = new int[] {8000, 11025, 22050, 44100};
+    private AudioRecord findAudioRecord()
+    {
+        for (int rate : mSampleRates)
+        {
+            for (short audioFormat : new short[] { AudioFormat.ENCODING_PCM_8BIT, AudioFormat.ENCODING_PCM_16BIT })
+            {
+                for (short channelConfig : new short[] { AudioFormat.CHANNEL_IN_MONO, AudioFormat.CHANNEL_IN_STEREO })
+                {
+                    try {
+                        //Log.d(C.TAG, "Attempting rate " + rate + "Hz, bits: " + audioFormat + ", channel: "
+                        //+ channelConfig);
+                        int bufferSize = AudioRecord.getMinBufferSize(rate, channelConfig, audioFormat);
+
+                        if (bufferSize != AudioRecord.ERROR_BAD_VALUE) {
+                            // check if we can instantiate and have a success
+                            AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, rate, channelConfig, audioFormat, bufferSize);
+
+                            if (recorder.getState() == AudioRecord.STATE_INITIALIZED)
+                                return recorder;
+                        }
+                    } catch (Exception e) {
+                        //Log.e(C.TAG, rate + "Exception, keep trying.",e);
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     ///////////////////////////////////////////////
     // Constants
@@ -35,7 +70,7 @@ public class AudioReceiver {
     // Used for receiving and transmitting the
     // primitive data elements (1s and 0s)
     //private OutgoingSource _source = null;
-    //private IncomingSink _sink = null;
+    private IncomingSink _sink = null;
 
 
     // For Audio Output
@@ -106,7 +141,7 @@ public class AudioReceiver {
         // We are basically trying to figure out where the edges are here,
         // in order to find the distance between them and pass that on to
         // the higher levels.
-        double meanVal = 0.0;
+        double meanVal;
         //System.out.println("shortsRead:  " + shortsRead);
         for (int i = 0; i < shortsRead; i++) {
 
@@ -203,14 +238,12 @@ public class AudioReceiver {
     }
 
 
-    /*
     public void registerIncomingSink(IncomingSink sink) {
         if (_isRunning) {
             throw new UnsupportedOperationException("AudioIO must be stopped to set a new sink.");
         }
         _sink = sink;
     }
-    */
 
     public void initialize() {
         // Create buffers to hold what a high and low

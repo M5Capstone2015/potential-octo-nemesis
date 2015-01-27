@@ -49,6 +49,18 @@
             android:id="@+id/processButton" />
     </LinearLayout>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fast Read"
+            android:id="@+id/button4" />
+    </LinearLayout>
+
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="200dp"

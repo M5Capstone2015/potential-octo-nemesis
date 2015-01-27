@@ -24,7 +24,7 @@ public class Main extends Activity {
     TextView dataTextView = null;
     TextView hijackTextView = null;
     TextView phoneDataTextView = null;
-    private static int[] mSampleRates = new int[] {8000, 11025, 22050, 44100};
+    private static int[] mSampleRates = new int[]{8000, 11025, 22050, 44100};
     AudioRecord _aru = null;
     AudioReceiver reader = null;
     short[] buffer = null;
@@ -37,33 +37,42 @@ public class Main extends Activity {
     }
 
 
-    public void readClick(View v)
-    {
+    public void readClick(View v) {
         int shortsRead = 0;
         if (_aru == null)
             return;
 
         data.clear();
 
-        for (int j = 0; j < 6; j++) // Take 6 samples
-        {
+        long startTime = System.nanoTime(); // Start timer
+
+        //for (int j = 0; j < 6; j++) // Take 6 samples
+        //{
             _aru.startRecording();
             shortsRead = _aru.read(buffer, 0, buffer.length);
+            long endTime = System.nanoTime(); // End timer
             for (int i = 0; i < shortsRead; i++) { // Copy data from buffer into stack.
                 data.add(buffer[i]);
             }
             // TODO Change this to setting the read(_,0,_) param to the offset. hopefully this will be faster
-        }
+        //}
 
         String text = ""; // Write the last sample to the ScrollView
-        for (int i = 0; i < shortsRead; i++)
-        {
+
+        long duration = (endTime - startTime) / 1000000; // Calc milliseconds
+
+        text += ("Sample time:  " + String.valueOf(duration));
+
+        for (int i = 0; i < shortsRead; i++) {
             String num = "" + i;
             String val = Short.toString(buffer[i]);
             text += "\n" + num + ", " + val;
         }
 
         dataTextView.setText(text);
+    }
+
+    public void readClick2(View v) {
     }
 
     public void clearClick(View v) {
@@ -80,7 +89,7 @@ public class Main extends Activity {
             long startTime = System.nanoTime(); // Start timer
             List<Integer> freqs = reader.fakeAudioRead(data);
             long endTime = System.nanoTime();
-            long duration = (endTime - startTime) /1000000;
+            long duration = (endTime - startTime) / 1000000;
 
             String text = "\nHiJack Data:";
             text += ("Num data points:  " + String.valueOf(data.size()));
@@ -141,6 +150,7 @@ public class Main extends Activity {
 
     private AudioRecord findAudioRecord()
     {
+        AudioRecord aru = null;
         for (int rate : mSampleRates)
         {
             for (short audioFormat : new short[] { AudioFormat.ENCODING_PCM_8BIT, AudioFormat.ENCODING_PCM_16BIT })
@@ -157,7 +167,7 @@ public class Main extends Activity {
                             AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, rate, channelConfig, audioFormat, bufferSize);
 
                             if (recorder.getState() == AudioRecord.STATE_INITIALIZED)
-                                return recorder;
+                                aru = recorder;
                         }
                     } catch (Exception e) {
                         //Log.e(C.TAG, rate + "Exception, keep trying.",e);
@@ -165,7 +175,7 @@ public class Main extends Activity {
                 }
             }
         }
-        return null;
+        return aru;
     }
 
 
