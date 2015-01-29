@@ -89,10 +89,17 @@ public class Main extends Activity {
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) /1000000;
 
+
+            NewDecoder decoder = new NewDecoder();
+            String res = decoder.HandleData(freqs);
+
             String statText = "\nHiJack Data:";
             statText += ("Num data points:  " + String.valueOf(data.size()));
             statText += ("\nNum freq coefficients:  " + String.valueOf(freqs.size()));
             statText += ("\nCalculation time:" + String.valueOf(duration) + " ms");
+            statText += ("\n---RESULTS----");
+            statText += ("\n" + res);
+            statText += ("\n--------------");
 
             hijackStats.setText(statText);
 
