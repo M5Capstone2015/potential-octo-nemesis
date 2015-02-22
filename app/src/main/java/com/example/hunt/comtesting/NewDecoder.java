@@ -43,7 +43,7 @@ public class NewDecoder {
             counter2 = 0;
             if (counter1 == 15)
             {
-                bitlist.clear();
+                //bitlist.clear();
                 System.out.println("TWO_30");
                 counter1 = 0;
                 startflag = 1;
