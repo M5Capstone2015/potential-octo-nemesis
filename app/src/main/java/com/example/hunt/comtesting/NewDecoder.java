@@ -43,6 +43,7 @@ public class NewDecoder {
             counter2 = 0;
             if (counter1 == 15)
             {
+                bitlist.clear();
                 System.out.println("TWO_30");
                 counter1 = 0;
                 startflag = 1;
@@ -51,6 +52,7 @@ public class NewDecoder {
         else if (freq == 2) {
             counter0 = 0;
             counter1 = 0;
+
             counter2 = counter2 + 1;
             if (8 == counter2) {
                 if (startflag == 1) {
@@ -72,12 +74,20 @@ public class NewDecoder {
 
             _readCount++;
 
+            /* ---------------------------------------- */
+            _readings.clear();
+            _foundBit = true;
+            readingData = convertBitsToString();
+            if (_foundBit)
+                return;
+            /* ---------------------------------------- */
+
             String newReading = convertBitsToString();
             _readings.add(newReading);
 
             bitlist.clear();
 
-            if(_readings.size() < 2)
+            if(_readings.size() < 3)
                 return;
 
             _readings.remove(0);
@@ -115,11 +125,9 @@ public class NewDecoder {
         for (Integer i : data) {
             this.HandleBit(i);
             if (_foundBit)
-                return "Read:  " + convertBitsToString();
-            else
-                return ":(";
+                return "Read:  " + readingData;
         }
-        return  "";
+        return ":(";
     }
 
     private String convertBitsToString() {

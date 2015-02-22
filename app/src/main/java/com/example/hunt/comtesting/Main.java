@@ -85,16 +85,33 @@ public class Main extends Activity {
             reader.startAudioIO();
 
             long startTime = System.nanoTime(); // Start timer
-            List<Integer> freqs = reader.fakeAudioRead(data);
+
+            int shortsRead = _aru.read(buffer, 0, buffer.length);
+
+            List<Short> freqs = new ArrayList<>();
+            for (int i = 0; i < shortsRead; i++) { // Copy data from buffer into stack.
+                freqs.add(buffer[i]);
+            }
+
+            List<Integer> results = reader.fakeAudioRead(freqs);
+
+            //List<Integer> freqs = reader.fakeAudioRead(data);
+
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) /1000000;
 
-
-            NewDecoder decoder = new NewDecoder();
-            String res = decoder.HandleData(freqs);
+            String res = "";
+            try {
+                NewDecoder decoder = new NewDecoder();
+                res = decoder.HandleData(results);
+            }
+            catch (Exception e)
+            {
+                String mes = e.getMessage();
+            }
 
             String statText = "\nHiJack Data:";
-            statText += ("Num data points:  " + String.valueOf(data.size()));
+            statText += ("Num data points:  " + String.valueOf(freqs.size()));
             statText += ("\nNum freq coefficients:  " + String.valueOf(freqs.size()));
             statText += ("\nCalculation time:" + String.valueOf(duration) + " ms");
             statText += ("\n---RESULTS----");
@@ -103,11 +120,14 @@ public class Main extends Activity {
 
             hijackStats.setText(statText);
 
+            /*
             String text = "";
             for (int i : freqs)
                 text = text + "\n" + String.valueOf(i);
 
+
             hijackTextView.setText(text);
+            */
         }
         else {
             hijackTextView.setText("\nReader object null.");
