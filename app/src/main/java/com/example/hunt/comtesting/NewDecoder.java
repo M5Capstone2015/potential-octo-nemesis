@@ -68,10 +68,15 @@ public class NewDecoder {
         }
         if (bitlist.size() == 8) {
             startflag = 0;
+            _readCount++;
+            if (_readCount < 2)
+                return;
+
             System.out.println("----WHOLE BIT----");
             for (Integer i : bitlist)
                 System.out.println("\t" + i);
             _foundBit = true;
+            _readCount = 0;
             //bitlist.clear();
         }
     }
@@ -105,6 +110,8 @@ public class NewDecoder {
             number = 2;
         return number;
     }
+
+    private int _readCount = 0;
 
 
     private int _count = 0;
