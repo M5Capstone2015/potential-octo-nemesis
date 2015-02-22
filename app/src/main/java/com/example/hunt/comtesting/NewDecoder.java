@@ -66,30 +66,60 @@ public class NewDecoder {
                 }
             }
         }
-        if (bitlist.size() == 8) {
+        if (bitlist.size() == 8)
+        {
             startflag = 0;
+
             _readCount++;
-            if (_readCount < 2)
+
+            String newReading = convertBitsToString();
+            _readings.add(newReading);
+
+            bitlist.clear();
+
+            if(_readings.size() < 2)
                 return;
 
-            System.out.println("----WHOLE BIT----");
-            for (Integer i : bitlist)
-                System.out.println("\t" + i);
-            _foundBit = true;
-            _readCount = 0;
-            //bitlist.clear();
+            _readings.remove(0);
+
+            String reading1 = _readings.get(0);
+            String reading2 = _readings.get(1);
+            String reading3 = _readings.get(2);
+
+            if (_readings.get(0).equals(_readings.get(1)) || _readings.get(0).equals(_readings.get(2)))
+            {
+                _foundBit = true;
+                readingData = reading1;
+            }
+            else if ( _readings.get(1).equals(_readings.get(2))) {
+//            do some shit here.
+                //   System.out.println("----WHOLE BIT----");
+                // for (Integer i : bitlist)
+                //   System.out.println("\t" + i);
+                _foundBit = true;
+                readingData = reading3;
+                _readCount = 0;
+                //bitlist.clear();
+            }
         }
     }
+
+    private String readingData = "";
+    private String reading1 = "";
+    private String reading2 = "";
+    private String reading3 = "";
 
     boolean _foundBit = false;
     public String HandleData(List<Integer> data)
     {
-        for (Integer i : data)
+        for (Integer i : data) {
             this.HandleBit(i);
-        if (_foundBit)
-            return "Read:  " + convertBitsToString();
-        else
-            return ":(";
+            if (_foundBit)
+                return "Read:  " + convertBitsToString();
+            else
+                return ":(";
+        }
+        return  "";
     }
 
     private String convertBitsToString() {
@@ -110,6 +140,8 @@ public class NewDecoder {
             number = 2;
         return number;
     }
+
+    private List<String> _readings = new ArrayList<>();
 
     private int _readCount = 0;
 
